@@ -151,12 +151,20 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
 
-            // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
+            if(gamepad1.right_trigger > 0.5) {
+                // Send calculated power to wheels
+                leftFrontDrive.setPower(leftFrontPower);
+                rightFrontDrive.setPower(rightFrontPower);
+                leftBackDrive.setPower(leftBackPower);
+                rightBackDrive.setPower(rightBackPower);
 
+            }
+            if(gamepad1.right_trigger <= 0.5) {
+                leftFrontDrive.setPower(leftFrontPower * 0.4);
+                rightFrontDrive.setPower(rightFrontPower * 0.4);
+                leftBackDrive.setPower(leftBackPower * 0.4);
+                rightBackDrive.setPower(rightBackPower * 0.4);
+            }
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
