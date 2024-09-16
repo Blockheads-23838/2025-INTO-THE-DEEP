@@ -55,10 +55,10 @@ public class Autonomous extends LinearOpMode {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotorEx.class, "left_front_drive");
-        leftBackDrive  = hardwareMap.get(DcMotorEx.class, "left_back_drive");
-        rightFrontDrive = hardwareMap.get(DcMotorEx.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotorEx.class, "right_back_drive");
+        leftFrontDrive  = hardwareMap.get(DcMotorEx.class, "left_front");
+        leftBackDrive  = hardwareMap.get(DcMotorEx.class, "left_back");
+        rightFrontDrive = hardwareMap.get(DcMotorEx.class, "right_front");
+        rightBackDrive = hardwareMap.get(DcMotorEx.class, "right_back");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -87,10 +87,13 @@ public class Autonomous extends LinearOpMode {
         runtime.reset();
 
          //goTo(300, 300, 90, 1, true);
-        goTo(450,200,1,0.5,true);
-        goTo(200,400,45,1,true);
-        goTo(-690,-240,11,0.05,true);
-
+        goTo(200, 200, 0, 1,true);
+        goTo(0,0,-135, 1, true);
+        goTo(300, 0, 0, 1, true);
+        goTo(-500,0,0,1,true);
+        goTo(0,0,135,1,true);
+        goTo(1000,450,0,1,true);
+        goTo(0,0,135,1,true);
     }
 
     public void goTo(double forward, double strafe, double yaw, double speed, boolean waitToFinish) {
