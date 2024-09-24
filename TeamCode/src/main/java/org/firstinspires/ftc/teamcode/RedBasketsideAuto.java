@@ -61,19 +61,28 @@ public class RedBasketsideAuto extends LinearOpMode {
         // forward just means that your going north int the direction of the robot. Strafe is side to side. Yaw is turning in degrees.
         // Speed is a number from -1 to 1 x 100 is the percent of speed.
         // Wait to finish means if true then wait for this line of code to finish while false means it can just run other code as well. //
-        goTo(200, 200, 0, 1,true);
+        /* (200, 200, 0, 1,true);
         goTo(0,0,-135, 1, true);
-        goTo(330, 0, 0, 1, true);
+        goTo(200, 0, 1,
+                1, true);
         goTo(-500,0,0,1,true);
         goTo(0,0,135,1,true);
         goTo(1100,0,0,1,true);
         goTo(0,0,-180,1,true);
         goTo(1800,0,0,0.5,true);
         goTo(-700,0,0,1,true);
-        goTo(0,0,150,1,true);
+        goTo(0,0,170,1,true);
+
+         */
+      goTo(750, 50,0,1,true);
+      goTo(-1000,0,0,1,true);
+      goTo(0,1650,0,1,true);
+      goTo(200,0,0,2,true);
+      goTo(0,0,-75,1,true);
+      goTo(300,0,0,1,true);
+      goTo(0,0,-25,1,true);
+      goTo(200,0,0,1,true);
     }
-
-
     public void goTo(double forward, double strafe, double yaw, double speed, boolean waitToFinish) {
         /**
          * Moves robot-centrically.  All is in ticks except yaw, which is approximately degrees such that 90 turns the robot very approximately 90 degrees clockwise.
