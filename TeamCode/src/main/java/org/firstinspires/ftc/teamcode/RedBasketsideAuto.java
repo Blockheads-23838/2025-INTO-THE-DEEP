@@ -74,8 +74,8 @@ public class RedBasketsideAuto extends LinearOpMode {
         goTo(0,0,170,1,true);
 
          */
-      goTo(750, 50,0,1,true);
-      goTo(-1000,0,0,1,true);
+      goTo(850, 50,0,1 ,true); //Sigma rizz gyatt ohio fanum tax.
+      goTo(-900,0,0,1,true);
       goTo(0,1650,0,1,true);
       goTo(200,0,0,2,true);
       goTo(0,0,-75,1,true);
