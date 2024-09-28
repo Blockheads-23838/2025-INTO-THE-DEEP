@@ -74,14 +74,22 @@ public class RedBasketsideAuto extends LinearOpMode {
         goTo(0,0,170,1,true);
 
          */
-      goTo(850, 50,0,1 ,true); //Sigma rizz gyatt ohio fanum tax.
-      goTo(-900,0,0,1,true);
-      goTo(0,1650,0,1,true);
-      goTo(200,0,0,2,true);
-      goTo(0,0,-75,1,true);
-      goTo(300,0,0,1,true);
-      goTo(0,0,-25,1,true);
-      goTo(200,0,0,1,true);
+        goTo(850, 50,0,1 ,true); //Sigma rizz gyatt ohio fanum tax.
+        sleep(1000);
+        goTo(-900,0,0,1,true);
+        sleep(1000);
+        goTo(0,1650,0,1,true);
+        sleep(1000);
+        goTo(200,0,0,1,true);
+        sleep(1000);
+        goTo(0,0,-75,1,true);
+        sleep(1000);
+        goTo(300,0,0,1,true);
+        sleep(1000);
+        goTo(0,0,-25,1,true);
+        sleep(1000);
+        goTo(200,0,0,1,true);
+        sleep(1000);
     }
     public void goTo(double forward, double strafe, double yaw, double speed, boolean waitToFinish) {
         /**
