@@ -29,10 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import static com.sun.tools.doclint.Entity.pi;
+import static java.lang.Math.cos;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -60,19 +63,20 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * the direction of all 4 motors (see code below).
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- *
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Omni Linear OpMode", group="Linear OpMode")
-public class BasicOmniOpMode_Linear extends LinearOpMode {
+@TeleOp(name="lift Teleop", group="Linear OpMode")
+public class LiftIncludingTeleop extends LinearOpMode {
 
-    // Declare OpMode members for each of the 4 motors.+
+    // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor slide = null;
+    private DcMotorEx pivot = null;
 
     @Override
     public void runOpMode() {
@@ -83,6 +87,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back");
+        slide = hardwareMap.get(DcMotor.class, "slide");
+       pivot = hardwareMap.get(DcMotorEx.class, "pivot");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -98,6 +104,8 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        slide.setDirection(DcMotor.Direction.FORWARD);
+        pivot.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
@@ -145,14 +153,23 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
             //      the setDirection() calls above.
             // Once the correct motors move in the correct direction re-comment this code.
 
-            // left back right front switch
             /*
             leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
             leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
             rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
+            */
+            double kP = .01;
+            double kG = .01;
+            double Setpoint = gamepad2.left_stick_y * 90;
+            double error = Setpoint * 5_281.1/360 - pivot.getCurrentPosition();
+            double clicks_per_rotation = 5_281.1;
+            pivot.setPower(kP * error + kG * cos(pivot.getCurrentPosition() * 2 * Math.PI / clicks_per_rotation));
+            // pivot power = kP * error + kG * cos(position)
 
-             */
+            if(slide.getCurrentPosition() <= 2000 && slide.getCurrentPosition() >= 1)
+                slide.setPower(gamepad2.right_stick_y);
+            // else-if(slide.getCurrentPosition() > 2000 slide.get)
 
             if(gamepad1.right_trigger > 0.5) {
                 // Send calculated power to wheels

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name="servo test", group="Linear OpMode")
 public class ServoTest extends LinearOpMode {
 
+    private Boolean open = false;
     private Servo servo = null;
     private Servo servo2 = null;
 
@@ -19,15 +20,45 @@ public class ServoTest extends LinearOpMode {
 
         waitForStart();
 
+
+        double openPosition = 0.05;
+        double closedPosition = 0;
+
+
         while (opModeIsActive()) {
+            // IF toggle button pressed:
+                // if open: servo.setPosition(closed)
+                // else: servo.setPosition(open)
+           if(gamepad1.a == true){
+               servo.setPosition(openPosition);
+           }
+           else {
+               servo.setPosition(closedPosition);
+           }
 
-            servo.setPosition(-gamepad1.right_stick_y);
-            servo2.setPosition(-gamepad1.right_stick_y);
 
-            telemetry.addData("servo power set to ", -gamepad2.right_stick_y);
+
+
+            /* // FIX BELOW
+
+            if (Math.abs(-gamepad1.right_stick_y) > 0) {
+                open = ((int) ((int) -gamepad1.right_stick_y + 0.9)) > 0;
+            }
+
+            if (open) {
+                servo.setDirection(0.9);
+                servo2.setPosition(-0.9);
+            }
+
+             */ //FIX ABOVE
+
+            telemetry.addData("servo set to ", -gamepad1.right_stick_y);
+            //telemetry.addData("open :" , open);
             telemetry.update();
 
-            sleep(20);
+            //sleep(1);
         }
     }
 }
+
+
