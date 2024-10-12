@@ -21,8 +21,8 @@ public class ServoTest extends LinearOpMode {
         waitForStart();
 
 
-        double openPosition = 0.05;
-        double closedPosition = 0;
+
+
 
 
         while (opModeIsActive()) {
@@ -30,10 +30,10 @@ public class ServoTest extends LinearOpMode {
                 // if open: servo.setPosition(closed)
                 // else: servo.setPosition(open)
            if(gamepad1.a == true){
-               servo.setPosition(openPosition);
+               servo.setPosition(Constants.claw_open);
            }
            else {
-               servo.setPosition(closedPosition);
+               servo.setPosition(Constants.claw_close);
            }
 
 

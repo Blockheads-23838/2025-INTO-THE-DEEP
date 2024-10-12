@@ -36,7 +36,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -77,6 +79,7 @@ public class LiftIncludingTeleop extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor slide = null;
     private DcMotorEx pivot = null;
+    private DcMotorEx wrist = null;
 
     @Override
     public void runOpMode() {
@@ -89,6 +92,7 @@ public class LiftIncludingTeleop extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back");
         slide = hardwareMap.get(DcMotor.class, "slide");
        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
+       wrist = hardwareMap.get(DcMotorEx.class, "wrist");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -104,14 +108,22 @@ public class LiftIncludingTeleop extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        slide.setDirection(DcMotor.Direction.FORWARD);
-        pivot.setDirection(DcMotor.Direction.FORWARD);
+        slide.setDirection(DcMotor.Direction.REVERSE);
+        pivot.setDirection(DcMotor.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-        waitForStart();
+        wrist.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wrist.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        while (!isStarted() && !isStopRequested()) {
+            telemetry.addData("pivot position: ", pivot.getCurrentPosition());
+            telemetry.addData("pivot position, rad: ", pivot.getCurrentPosition() * 2 * Math.PI/ Constants.pivot_clicks_per_rotation);
+            telemetry.addData("slide position: ", slide.getCurrentPosition());
+            telemetry.update();
+            //telemetry.addData("sending power to pivot: ", Constants.pivot_kP * error - Constants.pivot_kF *
+              //      cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation));
+        }
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
@@ -159,17 +171,45 @@ public class LiftIncludingTeleop extends LinearOpMode {
             rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
-            double kP = .01;
-            double kG = .01;
-            double Setpoint = gamepad2.left_stick_y * 90;
-            double error = Setpoint * 5_281.1/360 - pivot.getCurrentPosition();
-            double clicks_per_rotation = 5_281.1;
-            pivot.setPower(kP * error + kG * cos(pivot.getCurrentPosition() * 2 * Math.PI / clicks_per_rotation));
-            // pivot power = kP * error + kG * cos(position)
 
-            if(slide.getCurrentPosition() <= 2000 && slide.getCurrentPosition() >= 1)
+            if (gamepad2.b) {
+                pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
+            if (gamepad2.a) {
+                slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
+            double Setpoint = gamepad2.left_stick_y * 90;
+            double error = Setpoint * Constants.pivot_clicks_per_rotation/360 - pivot.getCurrentPosition();
+
+            telemetry.addData("pivot position: ", pivot.getCurrentPosition());
+            telemetry.addData("pivot position, rad: ", pivot.getCurrentPosition() * 2 * Math.PI/ Constants.pivot_clicks_per_rotation);
+            telemetry.addData("sending power to pivot: ", Constants.pivot_kP * error - Constants.pivot_kF *
+                    cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation - Constants.pivot_offset));
+
+            pivot.setPower(Constants.pivot_kP * error - Constants.pivot_kF *
+                    cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation - Constants.pivot_offset));
+
+            telemetry.addData("slide position: ", slide.getCurrentPosition());
+
+            if((slide.getCurrentPosition() <= Constants.slide_max_position && slide.getCurrentPosition() >= 1)
+                    || gamepad2.right_bumper || gamepad2.left_bumper) {
                 slide.setPower(gamepad2.right_stick_y);
+            } else if (slide.getCurrentPosition() > Constants.slide_max_position) {
+                slide.setPower(-0.1);
+            } else {
+                slide.setPower(0.1);
+            }
             // else-if(slide.getCurrentPosition() > 2000 slide.get)
+            double wrist_error = 100 * gamepad2.right_trigger - wrist.getCurrentPosition();
+            telemetry.addData("wrist setpoint: ", 100* gamepad2.right_trigger);
+            telemetry.addData("wrist error: ", wrist_error);
+            telemetry.addData("setting power to wrist: ", Constants.wrist_kP * wrist_error);
+            telemetry.addData("wrist position: ", wrist.getCurrentPosition());
+            wrist.setPower(Constants.wrist_kP * wrist_error);
 
             if(gamepad1.right_trigger > 0.5) {
                 // Send calculated power to wheels
@@ -185,6 +225,7 @@ public class LiftIncludingTeleop extends LinearOpMode {
                 leftBackDrive.setPower(leftBackPower * 0.4);
                 rightBackDrive.setPower(rightBackPower * 0.4);
             }
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);

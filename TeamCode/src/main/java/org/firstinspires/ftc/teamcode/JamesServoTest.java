@@ -14,8 +14,8 @@ public class JamesServoTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        servo = hardwareMap.get(CRServo.class, "servo");
-        servo2 = hardwareMap.get(CRServo.class, "servo2");
+        servo = hardwareMap.get(CRServo.class, "jamesservo1");
+        servo2 = hardwareMap.get(CRServo.class, "jamesservo2");
 
         waitForStart();
 
