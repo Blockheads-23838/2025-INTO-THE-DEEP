@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="servo test", group="Linear OpMode")
-public class ServoTest extends LinearOpMode {
+@TeleOp(name=" claw servo test", group="Linear OpMode")
+public class ClawServoTest extends LinearOpMode {
 
     private boolean open = false;
     private boolean input = false;
