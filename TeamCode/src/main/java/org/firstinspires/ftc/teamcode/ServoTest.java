@@ -8,37 +8,34 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp(name="servo test", group="Linear OpMode")
 public class ServoTest extends LinearOpMode {
 
-    private Boolean open = false;
+    private boolean open = false;
     private Servo servo = null;
-    private Double position = Constants.claw_closed;
+    private double position = Constants.claw_closed;
 
     @Override
     public void runOpMode() {
 
-        //servo = hardwareMap.get(Servo.class, "claw");
+        servo = hardwareMap.get(Servo.class, "claw");
 
         waitForStart();
 
-
-
-
-
-
         while (opModeIsActive()) {
-            // IF toggle button pressed:
-                // if open: servo.setPosition(closed)
-                // else: servo.setPosition(open)
-           if(gamepad1.a){
-               servo.setPosition(Constants.claw_open);
+            open = gamepad1.a;
+           if (open) {
+               position = Constants.claw_open;
            }
            else {
-               servo.setPosition(Constants.claw_closed);
+               position = Constants.claw_closed;
            }
 
+           servo.setPosition(position);
+
            telemetry.addData("servo angle (degrees): ", position * 300);
+           telemetry.addData("gamepad input: ", gamepad1.a);
+           telemetry.addData("servo open: ", open);
            telemetry.update();
 
-            //sleep(1);
+           sleep(20);
         }
     }
 }
