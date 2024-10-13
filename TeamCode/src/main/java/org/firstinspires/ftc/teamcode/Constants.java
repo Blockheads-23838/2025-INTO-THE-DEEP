@@ -12,6 +12,6 @@ public  class Constants {
     public static double pivot_clicks_per_rotation = 5_281.1;
     public static double wrist_kP = 0.003;
     public static double pivot_offset = Math.toRadians(-15); // this should be in RADIANS.  negative is down.
-    public static double servo_open = 0;
-    public static double servo_closed = 0;
+    public static double claw_open = 0.1;
+    public static double claw_closed = 0;
 }
