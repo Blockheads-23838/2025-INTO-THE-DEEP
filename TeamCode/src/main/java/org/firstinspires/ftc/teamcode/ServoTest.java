@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ServoTest extends LinearOpMode {
 
     private boolean open = false;
+    private boolean input = false;
     private Servo servo = null;
     private double position = Constants.claw_closed;
 
@@ -20,19 +21,24 @@ public class ServoTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            open = gamepad1.a;
-           if (open) {
-               position = Constants.claw_open;
-           }
-           else {
-               position = Constants.claw_closed;
-           }
+            input = gamepad1.a;
+            if (input) {
+                open = !open;
+
+
+                if (open) {
+                    position = Constants.claw_open;
+                }
+                else {
+                    position = Constants.claw_closed;
+                }
+            }
 
            servo.setPosition(position);
 
-           telemetry.addData("servo angle (degrees): ", position * 300);
-           telemetry.addData("gamepad input: ", gamepad1.a);
            telemetry.addData("servo open: ", open);
+           telemetry.addData("input (gamepad a button): ", input);
+           telemetry.addData("servo position: ", position);
            telemetry.update();
 
            sleep(20);
