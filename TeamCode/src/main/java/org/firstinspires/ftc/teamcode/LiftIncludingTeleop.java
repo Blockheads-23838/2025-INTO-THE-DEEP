@@ -116,8 +116,12 @@ public class LiftIncludingTeleop extends LinearOpMode {
         telemetry.update();
         wrist.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wrist.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         while (!isStarted() && !isStopRequested()) {
-            telemetry.addData("pivot position: ", pivot.getCurrentPosition());
+            //telemetry.addData("pivot position: ", pivot.getCurrentPosition());
             telemetry.addData("pivot position, rad: ", pivot.getCurrentPosition() * 2 * Math.PI/ Constants.pivot_clicks_per_rotation);
             telemetry.addData("slide position: ", slide.getCurrentPosition());
             telemetry.update();
@@ -125,6 +129,8 @@ public class LiftIncludingTeleop extends LinearOpMode {
               //      cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation));
         }
         runtime.reset();
+
+        double wristSetpoint = 0;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -171,7 +177,7 @@ public class LiftIncludingTeleop extends LinearOpMode {
             rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
             */
-
+            /*
             if (gamepad2.b) {
                 pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -181,30 +187,49 @@ public class LiftIncludingTeleop extends LinearOpMode {
                 slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
+            */
 
-            double Setpoint = gamepad2.left_stick_y * 90;
+            telemetry.addData("pivot position", pivot.getCurrentPosition() * Constants.pivot_clicks_per_rotation/360);
+
+
+
+
+            /*if(gamepad2.x == true) {
+                Setpoint = 0;
+                if (slide.getCurrentPosition() > 1000){
+                    wristSetpoint = 100;
+                }
+            }
+
+            if(gamepad2.y == true) {
+                Setpoint = 90;
+                wristSetpoint = 0;
+            }
+            */
+            double Setpoint = 90 * gamepad2.left_stick_y;
+
             double error = Setpoint * Constants.pivot_clicks_per_rotation/360 - pivot.getCurrentPosition();
 
-            telemetry.addData("pivot position: ", pivot.getCurrentPosition());
-            telemetry.addData("pivot position, rad: ", pivot.getCurrentPosition() * 2 * Math.PI/ Constants.pivot_clicks_per_rotation);
-            telemetry.addData("sending power to pivot: ", Constants.pivot_kP * error - Constants.pivot_kF *
-                    cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation - Constants.pivot_offset));
+            slide.getCurrentPosition(); // returns how extended the slide is, from about 0 to 2000
 
-            pivot.setPower(Constants.pivot_kP * error - Constants.pivot_kF *
+            // motor power = m(slide extension) + Constants.pivot_kF
+            double amount_to_counteract_gravity = Constants.pivot_m * slide.getCurrentPosition() + Constants.pivot_kF;
+
+            pivot.setPower(Constants.pivot_kP * error - amount_to_counteract_gravity *
                     cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation - Constants.pivot_offset));
 
             telemetry.addData("slide position: ", slide.getCurrentPosition());
 
-            if((slide.getCurrentPosition() <= Constants.slide_max_position && slide.getCurrentPosition() >= 1)
-                    || gamepad2.right_bumper || gamepad2.left_bumper) {
-                slide.setPower(gamepad2.right_stick_y);
+            if((slide.getCurrentPosition() <= Constants.slide_max_position && slide.getCurrentPosition() >= 1)) { //|| gamepad2.right_bumper || gamepad2.left_bumper) {
+                slide.setPower(-gamepad2.right_stick_y);
             } else if (slide.getCurrentPosition() > Constants.slide_max_position) {
-                slide.setPower(-0.1);
+                slide.setPower(0.2);
             } else {
-                slide.setPower(0.1);
+                slide.setPower(-0.2);
             }
             // else-if(slide.getCurrentPosition() > 2000 slide.get)
-            double wrist_error = 100 * gamepad2.right_trigger - wrist.getCurrentPosition();
+
+            double wrist_error = wristSetpoint - wrist.getCurrentPosition();
             telemetry.addData("wrist setpoint: ", 100* gamepad2.right_trigger);
             telemetry.addData("wrist error: ", wrist_error);
             telemetry.addData("setting power to wrist: ", Constants.wrist_kP * wrist_error);
