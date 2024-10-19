@@ -31,12 +31,14 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.sun.tools.doclint.Entity.pi;
 import static java.lang.Math.cos;
+import static java.lang.Math.toRadians;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -68,8 +70,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="lift Teleop", group="Linear OpMode")
-public class LiftIncludingTeleop extends LinearOpMode {
+@TeleOp(name="Main Comp Teleop", group="Linear OpMode")
+public class MainCompTeleop extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -80,6 +82,15 @@ public class LiftIncludingTeleop extends LinearOpMode {
     private DcMotor slide = null;
     private DcMotorEx pivot = null;
     private DcMotorEx wrist = null;
+
+    private boolean clawOpen = false;
+    private boolean clawInput = false;
+    private Servo clawServo = null;
+    private double clawPosition = Constants.claw_closed;
+
+    double wristSetpoint = 0; // setting here so we don't have to redeclare every loop,
+    double pivotSetpoint = 0; // allowing us to keep values when nothing's pressed
+
     private enum arm_status {
         STOWED, // slide in, pivot down so we can drive around normally
         SCORING, // pivot
@@ -98,6 +109,10 @@ public class LiftIncludingTeleop extends LinearOpMode {
         slide = hardwareMap.get(DcMotor.class, "slide");
        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
        wrist = hardwareMap.get(DcMotorEx.class, "wrist");
+
+        clawServo = hardwareMap.get(Servo.class, "claw");
+
+
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -119,43 +134,33 @@ public class LiftIncludingTeleop extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
         wrist.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wrist.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         while (!isStarted() && !isStopRequested()) {
             //telemetry.addData("pivot position: ", pivot.getCurrentPosition());
-            telemetry.addData("pivot position, rad: ", pivot.getCurrentPosition() * 2 * Math.PI/ Constants.pivot_clicks_per_rotation);
-            telemetry.addData("slide position: ", slide.getCurrentPosition());
+            telemetry.addData("pivot position (encoder counts):", pivot.getCurrentPosition());
+            telemetry.addData("slide position (encoder counts): ", slide.getCurrentPosition());
+            telemetry.addData("claw open: ", clawOpen);
             telemetry.update();
             //telemetry.addData("sending power to pivot: ", Constants.pivot_kP * error - Constants.pivot_kF *
               //      cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation));
         }
         runtime.reset();
 
-        double wristSetpoint = 0;
+
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             handleDrivetrain();
-
-
-            /*
-            if (gamepad2.b) {
-                pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
-
-            if (gamepad2.a) {
-                slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
-            */
-
-            // from leo- this is in the bizzare units of Constants.pivot_clicks_per_rotation^2 per rotation
-            // telemetry.addData("pivot position", pivot.getCurrentPosition() * Constants.pivot_clicks_per_rotation/360);
+            handleSlide();
+            handlePivot();
+            handleClaw();
 
 
             /*
@@ -171,41 +176,119 @@ public class LiftIncludingTeleop extends LinearOpMode {
                 wristSetpoint = 0;
             }
             */
-            double Setpoint = 90 * gamepad2.left_stick_y;
+            telemetry.addData("pivot position (encoder counts):", pivot.getCurrentPosition());
+            telemetry.addData("slide position (encoder counts): ", slide.getCurrentPosition());
+            telemetry.addData("claw open: ", clawOpen);
 
-            double error = Setpoint * Constants.pivot_clicks_per_rotation/360 - pivot.getCurrentPosition();
 
-            slide.getCurrentPosition(); // returns how extended the slide is, from about 0 to 2000
-
-            // motor power = m(slide extension) + Constants.pivot_kF
-            double amount_to_counteract_gravity = Constants.pivot_m * slide.getCurrentPosition() + Constants.pivot_kF;
-
-            pivot.setPower(Constants.pivot_kP * error - amount_to_counteract_gravity *
-                    cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation - Constants.pivot_offset));
-
-            telemetry.addData("slide position: ", slide.getCurrentPosition());
-
-            if(slide.getCurrentPosition() <= Constants.slide_max_position && slide.getCurrentPosition() >= 1) { //|| gamepad2.right_bumper || gamepad2.left_bumper) {
-                slide.setPower(-gamepad2.right_stick_y);
-            } else if (slide.getCurrentPosition() > Constants.slide_max_position) {
-                slide.setPower(0.2);
-            } else {
-                slide.setPower(-0.2);
-            }
             // else-if(slide.getCurrentPosition() > 2000 slide.get)
 
-            double wrist_error = wristSetpoint - wrist.getCurrentPosition();
-            telemetry.addData("wrist setpoint: ", 100* gamepad2.right_trigger);
-            telemetry.addData("wrist error: ", wrist_error);
-            telemetry.addData("setting power to wrist: ", Constants.wrist_kP * wrist_error);
-            telemetry.addData("wrist position: ", wrist.getCurrentPosition());
-            wrist.setPower(Constants.wrist_kP * wrist_error);
+
 
 
         }
     }
 
+    public void handleSlide() {
+        /*
+        if (gamepad2.a) {
+            slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+
+        if(slide.getCurrentPosition() <= Constants.slide_max_position && slide.getCurrentPosition() >= 1) { //|| gamepad2.right_bumper || gamepad2.left_bumper) {
+            slide.setPower(gamepad2.right_stick_y);
+        } else if (slide.getCurrentPosition() > Constants.slide_max_position) {
+            slide.setPower(-0.2);
+        } else {
+            slide.setPower(0.2);
+        }
+        */
+
+        if (slide.getCurrentPosition() <= Constants.slide_max_pose && slide.getCurrentPosition() >= Constants.slide_retracted_pose) {
+            slide.setPower(gamepad2.right_stick_y);
+        } else if (slide.getCurrentPosition() > Constants.slide_max_pose) {
+            slide.setPower(-0.2);
+        } else if (slide.getCurrentPosition() < Constants.slide_retracted_pose) {
+            slide.setPower(0.2);
+        }
+
+
+    }
+
+    public void handleClaw() {
+        clawInput = gamepad1.a;
+        if (clawInput) {
+            clawOpen = !clawOpen;
+
+            if (clawOpen) {
+                clawPosition = Constants.claw_open;
+            }
+            else {
+                clawPosition = Constants.claw_closed;
+            }
+        }
+
+        clawServo.setPosition(clawPosition);
+    }
+
     public void handlePivot() {
+        /*
+        if (gamepad2.b) {
+            pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
+        */
+
+        /*
+        double offset = 10;
+
+        if (gamepad2.x == true) {
+            // intake mode requested
+            pivotSetpoint = 0;
+            wristSetpoint = 270 * 360/5_281.1 - offset;
+        }
+        else if (gamepad2.y == true) {
+            // scoring mode requested
+            pivotSetpoint = 100;
+            wristSetpoint = 75 * 360/5_281.1 - offset;
+        }
+        */
+
+        /*
+        double wrist_error = wristSetpoint - wrist.getCurrentPosition();
+        wrist.setPower(Constants.wrist_kP * wrist_error);
+        telemetry.addData("wrist setpoint: ", 100* gamepad2.right_trigger);
+        telemetry.addData("wrist error: ", wrist_error);
+        telemetry.addData("setting power to wrist: ", Constants.wrist_kP * wrist_error);
+        telemetry.addData("wrist position: ", wrist.getCurrentPosition() * 5_281.1/360);
+        telemetry.update();
+        pivot.setPower(90 * gamepad2.left_stick_y);
+        */
+
+
+        /*
+        // error, in degrees, of pivot
+        double pivotError = pivotSetpoint - Constants.pivot_to_degrees(pivot.getCurrentPosition());
+
+        double gravity_compensation_coef = Constants.pivot_kF_slide_retracted +
+                Constants.slide_to_inches(slide.getCurrentPosition()) * Constants.pivot_kF_increase_per_slide_inch_extension;
+
+        double gravity_compensation = gravity_compensation_coef *
+                                        cos(toRadians(Constants.pivot_to_degrees(slide.getCurrentPosition())));
+
+        double p_controller_output = Constants.pivot_kP * pivotError;
+        pivot.setPower(p_controller_output + gravity_compensation);
+        */
+
+
+        if (pivot.getCurrentPosition() <= Constants.pivot_intake_pose && pivot.getCurrentPosition() >= Constants.pivot_high_pose) {
+            pivot.setPower(gamepad2.left_stick_y);
+        } else if (pivot.getCurrentPosition() > Constants.pivot_intake_pose) {
+            pivot.setPower(-0.2);
+        } else if (pivot.getCurrentPosition() < Constants.pivot_high_pose) {
+            pivot.setPower(0.2);
+        }
 
     }
 
