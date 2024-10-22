@@ -83,10 +83,9 @@ public class MainCompTeleop extends LinearOpMode {
     private DcMotorEx pivot = null;
     private DcMotorEx wrist = null;
 
-    private boolean clawOpen = false;
-    private boolean clawInput = false;
     private Servo clawServo = null;
-    private double clawPosition = Constants.claw_closed;
+
+    private double pivotError;
 
     double wristSetpoint = 0; // setting here so we don't have to redeclare every loop,
     double pivotSetpoint = 0; // allowing us to keep values when nothing's pressed
@@ -97,21 +96,22 @@ public class MainCompTeleop extends LinearOpMode {
         INTAKING
     }
 
+
+
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back");
         slide = hardwareMap.get(DcMotor.class, "slide");
-       pivot = hardwareMap.get(DcMotorEx.class, "pivot");
-       wrist = hardwareMap.get(DcMotorEx.class, "wrist");
+        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
+        wrist = hardwareMap.get(DcMotorEx.class, "wrist");
 
         clawServo = hardwareMap.get(Servo.class, "claw");
-
 
 
         // ########################################################################################
@@ -142,17 +142,17 @@ public class MainCompTeleop extends LinearOpMode {
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+
         while (!isStarted() && !isStopRequested()) {
             //telemetry.addData("pivot position: ", pivot.getCurrentPosition());
             telemetry.addData("pivot position (encoder counts):", pivot.getCurrentPosition());
             telemetry.addData("slide position (encoder counts): ", slide.getCurrentPosition());
-            telemetry.addData("claw open: ", clawOpen);
+            telemetry.addData("claw position", clawServo.getPosition());
             telemetry.update();
             //telemetry.addData("sending power to pivot: ", Constants.pivot_kP * error - Constants.pivot_kF *
-              //      cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation));
+            //      cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation));
         }
         runtime.reset();
-
 
 
         // run until the end of the match (driver presses STOP)
@@ -161,32 +161,27 @@ public class MainCompTeleop extends LinearOpMode {
             handleSlide();
             handlePivot();
             handleClaw();
+            handleWrist();
 
 
-            /*
-            if(gamepad2.x == true) {
-                Setpoint = 0;
-                if (slide.getCurrentPosition() > 1000){
-                    wristSetpoint = 100;
-                }
-            }
-
-            if(gamepad2.y == true) {
-                Setpoint = 90;
-                wristSetpoint = 0;
-            }
-            */
             telemetry.addData("pivot position (encoder counts):", pivot.getCurrentPosition());
             telemetry.addData("slide position (encoder counts): ", slide.getCurrentPosition());
-            telemetry.addData("claw open: ", clawOpen);
-
-
-            // else-if(slide.getCurrentPosition() > 2000 slide.get)
-
+            telemetry.addData("wrist position", wrist.getCurrentPosition());
+            telemetry.addData("claw position", clawServo.getPosition());
 
 
 
         }
+    }
+    public void handleWrist() {
+        if (wrist.getCurrentPosition() < 90 & wrist.getCurrentPosition() > -90) {
+            wrist.setPower((gamepad2.right_trigger - gamepad2.left_trigger) / Constants.wrist_power);
+        } else if (wrist.getCurrentPosition() > 90) {
+            wrist.setPower(-0.05);
+        } else if (wrist.getCurrentPosition() < -90) {
+            wrist.setPower(0.05);
+        }
+
     }
 
     public void handleSlide() {
@@ -205,41 +200,32 @@ public class MainCompTeleop extends LinearOpMode {
         }
         */
 
-        if (slide.getCurrentPosition() <= Constants.slide_max_pose && slide.getCurrentPosition() >= Constants.slide_retracted_pose) {
-            slide.setPower(gamepad2.right_stick_y);
-        } else if (slide.getCurrentPosition() > Constants.slide_max_pose) {
-            slide.setPower(-0.2);
-        } else if (slide.getCurrentPosition() < Constants.slide_retracted_pose) {
-            slide.setPower(0.2);
-        }
+        //if (slide.getCurrentPosition() <= Constants.slide_max_pose && slide.getCurrentPosition() >= Constants.slide_retracted_pose) {
+        slide.setPower(-gamepad2.right_stick_y);
+
+        //} else if (slide.getCurrentPosition() > Constants.slide_max_pose) {
+           // slide.setPower(-0.2);
+        //} else if (slide.getCurrentPosition() < Constants.slide_retracted_pose) {
+            //slide.setPower(0.2);
+        //}
 
 
     }
 
     public void handleClaw() {
-        clawInput = gamepad1.a;
-        if (clawInput) {
-            clawOpen = !clawOpen;
-
-            if (clawOpen) {
-                clawPosition = Constants.claw_open;
+        if (gamepad2.a) {
+            if (clawServo.getPosition() == Constants.claw_open) {
+                clawServo.setPosition(Constants.claw_closed);
             }
             else {
-                clawPosition = Constants.claw_closed;
+                clawServo.setPosition(Constants.claw_open);
             }
         }
 
-        clawServo.setPosition(clawPosition);
+
     }
 
     public void handlePivot() {
-        /*
-        if (gamepad2.b) {
-            pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-        */
-
         /*
         double offset = 10;
 
@@ -267,8 +253,9 @@ public class MainCompTeleop extends LinearOpMode {
         */
 
 
-        /*
+
         // error, in degrees, of pivot
+        /*
         double pivotError = pivotSetpoint - Constants.pivot_to_degrees(pivot.getCurrentPosition());
 
         double gravity_compensation_coef = Constants.pivot_kF_slide_retracted +
@@ -282,15 +269,34 @@ public class MainCompTeleop extends LinearOpMode {
         */
 
 
+        //ARSHAN's PIVOT CODE BELOW - FIX IT!!!!
+        /*
         if (pivot.getCurrentPosition() <= Constants.pivot_intake_pose && pivot.getCurrentPosition() >= Constants.pivot_high_pose) {
             pivot.setPower(gamepad2.left_stick_y);
-        } else if (pivot.getCurrentPosition() > Constants.pivot_intake_pose) {
-            pivot.setPower(-0.2);
-        } else if (pivot.getCurrentPosition() < Constants.pivot_high_pose) {
+        } else if (pivot.getCurrentPosition() < Constants.pivot_intake_pose) {
             pivot.setPower(0.2);
+        } else if (pivot.getCurrentPosition() > Constants.pivot_high_pose) {
+            pivot.setPower(-0.2);
+        }
+        */
+
+        if (gamepad2.x) { //hold x to get to high basket
+            pivotError = Constants.pivot_high_pose - pivot.getCurrentPosition();
+
+            pivot.setPower(Constants.pivot_error_multiplier * pivotError);
+        } else if (gamepad2.y) { //hold y to get to low basket
+            pivotError = Constants.pivot_intake_pose - pivot.getCurrentPosition();
+
+            pivot.setPower(Constants.pivot_error_multiplier * pivotError);
         }
 
+        //ARSHAN's PIVOT CODE ABOVE
+
+
     }
+
+
+
 
     public void handleDrivetrain() {
         double max;
