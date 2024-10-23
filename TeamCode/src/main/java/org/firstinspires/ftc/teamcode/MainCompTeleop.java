@@ -82,6 +82,7 @@ public class MainCompTeleop extends LinearOpMode {
     private DcMotor slide = null;
     private DcMotorEx pivot = null;
     private DcMotorEx wrist = null;
+    private double tick = 0;
 
     private Servo clawServo = null;
 
@@ -169,7 +170,7 @@ public class MainCompTeleop extends LinearOpMode {
             telemetry.addData("wrist position", wrist.getCurrentPosition());
             telemetry.addData("claw position", clawServo.getPosition());
 
-
+            tick++;
 
         }
     }
@@ -213,11 +214,11 @@ public class MainCompTeleop extends LinearOpMode {
     }
 
     public void handleClaw() {
-        if (gamepad2.a) {
+        if (gamepad2.a && (tick % 50 == 0)) {
             if (clawServo.getPosition() == Constants.claw_open) {
                 clawServo.setPosition(Constants.claw_closed);
             }
-            else {
+            else if (clawServo.getPosition() == Constants.claw_closed){
                 clawServo.setPosition(Constants.claw_open);
             }
         }
