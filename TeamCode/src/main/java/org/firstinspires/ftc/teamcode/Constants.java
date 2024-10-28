@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public  class Constants {
+    // ------------ FIELD -------------
+    public static double distance_to_sub = 800; //ticks
     // ------------ PIVOT -------------
     public static double pivot_coefficient = 2;
     public static double pivot_kP = 0.001;

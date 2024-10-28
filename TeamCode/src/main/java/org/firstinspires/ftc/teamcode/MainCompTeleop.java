@@ -83,20 +83,20 @@ public class MainCompTeleop extends LinearOpMode {
     private DcMotorEx pivot = null;
     private DcMotorEx wrist = null;
 
-    private Servo clawServo = null;
+    private double integralSum = 0;
+    private double kP = 1;
+    private double kI = 1;
+    private double kD = 1;
 
     private double pivotError;
 
-    double wristSetpoint = 0; // setting here so we don't have to redeclare every loop,
-    double pivotSetpoint = 0; // allowing us to keep values when nothing's pressed
+    private Servo clawServo = null;
 
     private enum arm_status {
         STOWED, // slide in, pivot down so we can drive around normally
         SCORING, // pivot
         INTAKING
     }
-
-
 
     @Override
     public void runOpMode() {
@@ -108,8 +108,8 @@ public class MainCompTeleop extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
         wrist = hardwareMap.get(DcMotorEx.class, "wrist");
+        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
 
         clawServo = hardwareMap.get(Servo.class, "claw");
 
@@ -149,8 +149,6 @@ public class MainCompTeleop extends LinearOpMode {
             telemetry.addData("slide position (encoder counts): ", slide.getCurrentPosition());
             telemetry.addData("claw position", clawServo.getPosition());
             telemetry.update();
-            //telemetry.addData("sending power to pivot: ", Constants.pivot_kP * error - Constants.pivot_kF *
-            //      cos(pivot.getCurrentPosition() * 2 * Math.PI / Constants.pivot_clicks_per_rotation));
         }
         runtime.reset();
 
@@ -172,15 +170,16 @@ public class MainCompTeleop extends LinearOpMode {
 
         }
     }
+
     public void handleWrist() {
 
         if (wrist.getCurrentPosition() < 180 & wrist.getCurrentPosition() > -180) {
             wrist.setPower((gamepad2.right_trigger - gamepad2.left_trigger) / Constants.wrist_power);
 
-        } else if (wrist.getCurrentPosition() > 180) {
+        } else if (wrist.getCurrentPosition() > 360) {
             wrist.setPower(-0.08);
 
-        } else if (wrist.getCurrentPosition() < -180) {
+        } else if (wrist.getCurrentPosition() < -360) {
             wrist.setPower(0.08);
         }
 
@@ -249,9 +248,6 @@ public class MainCompTeleop extends LinearOpMode {
     }
 
     public void handlePivot() {
-
-
-
         // error, in degrees, of pivot
         /*
         double pivotError = pivotSetpoint - Constants.pivot_to_degrees(pivot.getCurrentPosition());
@@ -268,7 +264,7 @@ public class MainCompTeleop extends LinearOpMode {
 
 
         //ARSHAN's PIVOT CODE BELOW - FIX IT!!!!
-
+        /*
         if (gamepad2.x) { //hold x to get to high basket
             pivotError = Constants.pivot_high_pose - pivot.getCurrentPosition();
 
@@ -278,6 +274,7 @@ public class MainCompTeleop extends LinearOpMode {
 
             pivot.setPower(Constants.pivot_error_multiplier * pivotError * pivotError);
         }
+        */
 
         //ARSHAN's PIVOT CODE ABOVE
 

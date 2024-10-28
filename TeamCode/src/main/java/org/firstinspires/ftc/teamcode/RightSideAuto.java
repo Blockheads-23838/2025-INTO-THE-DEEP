@@ -6,11 +6,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
 
-@Autonomous(name="Red basketside auto", group="Linear OpMode")
-public class RedBasketsideAuto extends LinearOpMode {
+@Autonomous(name="Right Side Auto", group="Linear OpMode")
+public class RightSideAuto extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -18,6 +19,8 @@ public class RedBasketsideAuto extends LinearOpMode {
     private DcMotorEx leftBackDrive = null;
     private DcMotorEx rightFrontDrive = null;
     private DcMotorEx rightBackDrive = null;
+    private DcMotorEx wrist = null;
+    private Servo clawServo = null;
 
     ArrayList<DcMotorEx> driveMotors = new ArrayList<>();
 
@@ -30,6 +33,8 @@ public class RedBasketsideAuto extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotorEx.class, "left_back");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "right_front");
         rightBackDrive = hardwareMap.get(DcMotorEx.class, "right_back");
+        wrist = hardwareMap.get(DcMotorEx.class, "wrist");
+        clawServo = hardwareMap.get(Servo.class, "claw");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -45,17 +50,49 @@ public class RedBasketsideAuto extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        wrist.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        wrist.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         driveMotors.add(leftFrontDrive);
         driveMotors.add(leftBackDrive);
         driveMotors.add(rightFrontDrive);
         driveMotors.add(rightBackDrive);
+
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         waitForStart();
         runtime.reset();
+        goTo(Constants.distance_to_sub,0,0,1,true);
+
+        while (wrist.getCurrentPosition() < 200) {
+            wrist.setPower(1 / Constants.wrist_power);
+        }
+
+        clawServo.setPosition(1);
+
+        //TUNE ALL MOVEMENT VALUES BELOW
+        goTo(-100, 0, 0, 1, true);
+
+        goTo(0, 800, 0, 1, true);
+
+        goTo(800, 0, 0, 1, true);
+
+        for (int i = 0; i < 3; i++) {
+            goTo(0, 150, 0, 1, true);
+
+            goTo(-1300, 0, 0, 1, true);
+
+            goTo(1300, 0, 0, 1, true);
+        }
+
+        goTo(0, 0, 180, 1, true);
+
+        goTo(1250, 0, 0, 1, true);
+        //TUNE ALL MOVEMENT VALUES ABOVE!!!
+
 
          //goTo(300, 300, 90, 1, true);
         // forward just means that your going north int the direction of the robot. Strafe is side to side. Yaw is turning in degrees.
@@ -74,12 +111,14 @@ public class RedBasketsideAuto extends LinearOpMode {
         goTo(0,0,170,1,true);
 
          */
-        goTo(850, 50,0,1 ,true); //Sigma rizz gyatt ohio fanum tax.
+        /*
+        goTo(850, 50,0,1 ,true);
         goTo(-900,0,0,1,true);
         goTo(0,1650,0,1,true);
         goTo(200,0,0,1,true);
         goTo(0,0,-75,1,true);
         goTo(1500,0,0,1,true);
+        */
 
     }
     public void goTo(double forward, double strafe, double yaw, double speed, boolean waitToFinish) {
