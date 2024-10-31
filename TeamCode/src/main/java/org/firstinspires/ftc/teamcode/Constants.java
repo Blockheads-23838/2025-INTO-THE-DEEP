@@ -30,6 +30,19 @@ public  class Constants {
     public static double slide_retracted_pose = 5; //encoder counts; minimum slide pose
     public static double slide_max_pose = 2600; //encoder counts; max slide pose
 
+    public static double slide_trapezoidal_power(double slide_position, double sign) {
+        if (slide_position < 900) {
+            return (slide_position / 2600) * sign;
+        }
+        else if (slide_position < 1800) {
+            return (0.5 * sign);
+        }
+        else if (slide_position < 2600) {
+            return (slide_position / 2600) * sign;
+        }
+        return 0;
+    }
+
     //public static double slide_to_inches(double slide_get_current_position_output) {
         //return slide_get_current_position_output / slide_clicks_per_inch;
     //}

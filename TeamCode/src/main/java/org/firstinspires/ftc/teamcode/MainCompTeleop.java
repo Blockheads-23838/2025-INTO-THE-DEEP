@@ -202,13 +202,17 @@ public class MainCompTeleop extends LinearOpMode {
         */
 
         //if (slide.getCurrentPosition() <= Constants.slide_max_pose && slide.getCurrentPosition() >= Constants.slide_retracted_pose) {
-        slide.setPower(-gamepad2.right_stick_y);
+        //if (Math.abs(gamepad2.right_stick_y) > 0) {
+            //slide.setPower(Constants.slide_trapezoidal_power(slide.getCurrentPosition(), -(gamepad2.right_stick_y / Math.abs(gamepad2.right_stick_y))) - gamepad2.right_stick_y);
+        //}
 
         //} else if (slide.getCurrentPosition() > Constants.slide_max_pose) {
            // slide.setPower(-0.2);
         //} else if (slide.getCurrentPosition() < Constants.slide_retracted_pose) {
             //slide.setPower(0.2);
         //}
+
+        slide.setPower(-gamepad2.right_stick_y * 0.5);
 
 
     }
