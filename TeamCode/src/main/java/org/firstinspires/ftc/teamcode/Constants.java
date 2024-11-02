@@ -7,13 +7,12 @@ public  class Constants {
     // ------------ FIELD -------------
     public static double distance_to_sub = 800; //ticks
     // ------------ PIVOT -------------
-    public static double pivot_coefficient = 2;
-    public static double pivot_kP = 0.001;
-    public static double pivot_kF_slide_retracted = 0.3;
     public static double pivot_intake_pose = 80; //encoder counts; lowest the arm should go
-    public static double pivot_high_pose = -1600; //encoder counts; highest the arm should go; high basket
-    public static double pivot_kF_increase_per_slide_inch_extension = .3;
-    public static double pivot_error_multiplier = 0.01;
+    public static double pivot_high_pose = -800; //encoder counts; highest the arm should go; high basket
+    public static double pivot_p = 0.1;
+    public static double pivot_i = 0;
+    public static double pivot_d = 0;
+    public static double pivot_f = 0;
     //public static double pivot_clicks_per_rotation = 5_281.1;
     //public static double pivot_offset = -15; // this should be in DEGREES.  negative is down.
 

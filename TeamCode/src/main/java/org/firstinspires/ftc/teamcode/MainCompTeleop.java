@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -212,33 +213,12 @@ public class MainCompTeleop extends LinearOpMode {
             //slide.setPower(0.2);
         //}
 
-        slide.setPower(-gamepad2.right_stick_y * 0.5);
+        slide.setPower(-gamepad2.right_stick_y * 1.5);
 
 
     }
 
     public void handleClaw() {
-        /*
-        //0.5 = open; -0.2 = close
-        if (gamepad2.a && (tick % 50 == 0)) {// && clawServo.getPosition() != Constants.claw_closed) {
-            clawServo.setPosition(-0.2);
-        }
-        else if (gamepad2.b && (tick % 50 == 0)) {// && clawServo.getPosition() != Constants.claw_open) {
-            clawServo.setPosition(0.5);
-        }
-        */
-
-        /*
-        if (gamepad2.a) {
-            if (clawServo.getPosition() == 1) {
-                clawServo.setPosition(0.5);
-            }
-            else {
-                clawServo.setPosition(1);
-            }
-        }
-        */
-
 
         //b is close; a is open
 
@@ -252,19 +232,7 @@ public class MainCompTeleop extends LinearOpMode {
     }
 
     public void handlePivot() {
-        // error, in degrees, of pivot
-        /*
-        double pivotError = pivotSetpoint - Constants.pivot_to_degrees(pivot.getCurrentPosition());
 
-        double gravity_compensation_coef = Constants.pivot_kF_slide_retracted +
-                Constants.slide_to_inches(slide.getCurrentPosition()) * Constants.pivot_kF_increase_per_slide_inch_extension;
-
-        double gravity_compensation = gravity_compensation_coef *
-                                        cos(toRadians(Constants.pivot_to_degrees(slide.getCurrentPosition())));
-
-        double p_controller_output = Constants.pivot_kP * pivotError;
-        pivot.setPower(p_controller_output + gravity_compensation);
-        */
 
 
         //ARSHAN's PIVOT CODE BELOW - FIX IT!!!!
@@ -281,6 +249,22 @@ public class MainCompTeleop extends LinearOpMode {
         */
 
         //ARSHAN's PIVOT CODE ABOVE
+
+        pivot.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(Constants.pivot_p, Constants.pivot_i, Constants.pivot_d, Constants.pivot_f));
+
+        if (gamepad2.dpad_up) {
+            pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            pivot.setTargetPosition((int)Constants.pivot_high_pose);
+            pivot.setPower(0.5);
+        } else if (gamepad2.dpad_down) {
+            pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            pivot.setTargetPosition((int)Constants.pivot_intake_pose);
+            pivot.setPower(1);
+
+        }
+
 
 
     }
@@ -325,13 +309,6 @@ public class MainCompTeleop extends LinearOpMode {
         //   2) Then make sure they run in the correct direction by modifying the
         //      the setDirection() calls above.
         // Once the correct motors move in the correct direction re-comment this code.
-
-            /*
-            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-            */
 
         if(gamepad1.right_trigger > 0.5) {
             // Send calculated power to wheels

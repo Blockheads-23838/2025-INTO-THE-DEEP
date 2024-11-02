@@ -26,6 +26,8 @@ public class JamesServoTest extends LinearOpMode {
 
 
             telemetry.addData("servo set to ", -gamepad1.right_stick_y);
+            telemetry.addData("servo1 power", servo.getPower());
+            telemetry.addData("servo2 power", servo2.getPower());
             telemetry.update();
 
             sleep(20);
