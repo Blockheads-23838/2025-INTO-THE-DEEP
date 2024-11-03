@@ -158,7 +158,7 @@ public class MainCompTeleop extends LinearOpMode {
         while (opModeIsActive()) {
             handleDrivetrain();
             handleSlide();
-            //handlePivot();
+            handlePivot();
             handleClaw();
             handleWrist();
 
@@ -247,9 +247,13 @@ public class MainCompTeleop extends LinearOpMode {
             pivot.setPower(Constants.pivot_error_multiplier * pivotError * pivotError);
         }
         */
-
         //ARSHAN's PIVOT CODE ABOVE
 
+
+        pivot.setPower(gamepad2.left_stick_y * 1.2);
+
+
+        /*
         pivot.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(Constants.pivot_p, Constants.pivot_i, Constants.pivot_d, Constants.pivot_f));
 
         if (gamepad2.dpad_up) {
@@ -264,6 +268,8 @@ public class MainCompTeleop extends LinearOpMode {
             pivot.setPower(1);
 
         }
+
+         */
 
 
 
