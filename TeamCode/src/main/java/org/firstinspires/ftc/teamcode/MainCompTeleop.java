@@ -174,7 +174,7 @@ public class MainCompTeleop extends LinearOpMode {
 
     public void handleWrist() {
 
-        if (wrist.getCurrentPosition() < 180 & wrist.getCurrentPosition() > -180) {
+        if (wrist.getCurrentPosition() < 360 & wrist.getCurrentPosition() > -360) {
             wrist.setPower((gamepad2.right_trigger - gamepad2.left_trigger) / Constants.wrist_power);
 
         } else if (wrist.getCurrentPosition() > 360) {
@@ -185,6 +185,7 @@ public class MainCompTeleop extends LinearOpMode {
         }
 
     }
+
 
     public void handleSlide() {
         /*
@@ -212,6 +213,21 @@ public class MainCompTeleop extends LinearOpMode {
         //} else if (slide.getCurrentPosition() < Constants.slide_retracted_pose) {
             //slide.setPower(0.2);
         //}
+
+        /*
+        if(gamepad2.dpad_left) {
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setTargetPosition(0);
+            slide.setPower(0.5);
+        }
+        if(gamepad2.dpad_right) {
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setTargetPosition(-2600);
+            slide.setPower(0.5);
+        }
+         */
 
         slide.setPower(-gamepad2.right_stick_y * 1.5);
 
@@ -250,28 +266,24 @@ public class MainCompTeleop extends LinearOpMode {
         //ARSHAN's PIVOT CODE ABOVE
 
 
-        pivot.setPower(gamepad2.left_stick_y * 1.2);
+        //pivot.setPower(gamepad2.left_stick_y * 1.2);
 
 
-        /*
-        pivot.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(Constants.pivot_p, Constants.pivot_i, Constants.pivot_d, Constants.pivot_f));
+
+        //pivot.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(Constants.pivot_p, Constants.pivot_i, Constants.pivot_d, Constants.pivot_f));
 
         if (gamepad2.dpad_up) {
             pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             pivot.setTargetPosition((int)Constants.pivot_high_pose);
-            pivot.setPower(0.5);
+            pivot.setPower(1);
         } else if (gamepad2.dpad_down) {
             pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            pivot.setTargetPosition((int)Constants.pivot_intake_pose);
+            pivot.setTargetPosition((int) Constants.pivot_intake_pose);
             pivot.setPower(1);
 
         }
-
-         */
-
-
 
     }
 
