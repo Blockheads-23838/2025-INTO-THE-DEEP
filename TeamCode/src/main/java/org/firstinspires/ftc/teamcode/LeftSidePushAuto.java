@@ -63,33 +63,7 @@ public class LeftSidePushAuto extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        goTo(Constants.distance_to_sub,0,0,1,true);
 
-        while (wrist.getCurrentPosition() < 200) {
-            wrist.setPower(1 / Constants.wrist_power);
-        }
-
-        clawServo.setPosition(1);
-
-        //TUNE ALL MOVEMENT VALUES BELOW
-        goTo(-100, 0, 0, 1, true);
-
-        goTo(0, -800, 0, 1, true);
-
-        goTo(800, 0, 0, 1, true);
-
-        for (int i = 0; i < 3; i++) {
-            goTo(0, -150, 0, 1, true);
-
-            goTo(-1300, 0, 0, 1, true);
-
-            goTo(1300, 0, 0, 1, true);
-        }
-
-        goTo(800, 800, 0, 1, true);
-
-        goTo(0, 0, 90, 1, true);
-        //TUNE ALL MOVEMENT VALUES ABOVE!!!
 
 
         //goTo(300, 300, 90, 1, true);

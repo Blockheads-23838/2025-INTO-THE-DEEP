@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.ArrayList;
 
-@Autonomous(name="Right Side Auto", group="Linear OpMode")
-public class RightSideAuto extends LinearOpMode {
+@Autonomous(name="Right Side Push Auto", group="Linear OpMode")
+public class RightSidePushAuto extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -65,33 +65,7 @@ public class RightSideAuto extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        goTo(Constants.distance_to_sub,0,0,1,true);
-
-        while (wrist.getCurrentPosition() < 200) {
-            wrist.setPower(1 / Constants.wrist_power);
-        }
-
-        clawServo.setPosition(1);
-
-        //TUNE ALL MOVEMENT VALUES BELOW
-        goTo(-100, 0, 0, 1, true);
-
-        goTo(0, 800, 0, 1, true);
-
-        goTo(800, 0, 0, 1, true);
-
-        for (int i = 0; i < 3; i++) {
-            goTo(0, 150, 0, 1, true);
-
-            goTo(-1300, 0, 0, 1, true);
-
-            goTo(1300, 0, 0, 1, true);
-        }
-
-        goTo(0, 0, 180, 1, true);
-
-        goTo(1250, 0, 0, 1, true);
-        //TUNE ALL MOVEMENT VALUES ABOVE!!!
+        goTo(Constants.length_of_block,0,0,1,true);
 
 
          //goTo(300, 300, 90, 1, true);
@@ -111,6 +85,8 @@ public class RightSideAuto extends LinearOpMode {
         goTo(0,0,170,1,true);
 
          */
+
+
         /*
         goTo(850, 50,0,1 ,true);
         goTo(-900,0,0,1,true);

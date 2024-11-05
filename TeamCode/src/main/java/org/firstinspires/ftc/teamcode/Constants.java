@@ -5,7 +5,8 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public  class Constants {
     // ------------ FIELD -------------
-    public static double distance_to_sub = 800; //ticks
+    public static double length_of_block = 878;
+    //ticks
     // ------------ PIVOT -------------
     public static double pivot_intake_pose = 80; //encoder counts; lowest the arm should go
     public static double pivot_high_pose = 3800; //encoder counts; highest the arm should go; high basket
