@@ -29,19 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static com.sun.tools.doclint.Entity.pi;
-import static java.lang.Math.cos;
-import static java.lang.Math.max;
-import static java.lang.Math.toRadians;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -74,7 +66,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Main Comp Teleop", group="Linear OpMode")
-public class MainCompTeleop extends LinearOpMode {
+public class JamesTeleop extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -177,9 +169,7 @@ public class MainCompTeleop extends LinearOpMode {
     }
 
     public void handleWrist() {
-        servoSetpoint = servoSetpoint + (gamepad2.right_trigger - gamepad2.left_trigger) * 0.05;
-        servoSetpoint = Math.max(Math.min(servoSetpoint, 1), 0);
-        telemetry.addData("servo setpoint: ", servoSetpoint);
+        servoSetpoint = servoSetpoint + (gamepad2.right_trigger - gamepad2.left_trigger) * 0.001;
         if (wristTest.getPosition() != servoSetpoint) {
             wristTest.setPosition(servoSetpoint);
         }
