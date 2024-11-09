@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -65,7 +66,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Main Comp Teleop", group="Linear OpMode")
+@TeleOp(name="James Teleop", group="Linear OpMode")
 public class JamesTeleop extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
@@ -79,7 +80,8 @@ public class JamesTeleop extends LinearOpMode {
     private DcMotorEx wrist = null;
 
     private Servo wristTest = null;
-
+    private CRServo leftspinServo = null;
+    private CRServo rightspinServo = null;
     double servoSetpoint = 0;
 
 
@@ -109,6 +111,8 @@ public class JamesTeleop extends LinearOpMode {
         wristTest = hardwareMap.get(Servo.class, "wristServoTest");
 
         clawServo = hardwareMap.get(Servo.class, "claw");
+        leftspinServo = hardwareMap.get(CRServo.class, "i dont know but ur gonna have to configure this");
+        rightspinServo = hardwareMap.get(CRServo.class, "weeeeeeeeeeeeeeee");
 
 
         // ########################################################################################
@@ -203,15 +207,20 @@ public class JamesTeleop extends LinearOpMode {
 
     public void handleClaw() {
 
-        //b is close; a is open
-
+        if (gamepad2.a) {
+            leftspinServo.setPower(-1);
+            rightspinServo.setPower(1);
+        } else if (!gamepad2.a) {
+            leftspinServo.setPower(0);
+            rightspinServo.setPower(0);
+        }
         if (gamepad2.b) {
-            clawServo.setPosition(0.5);
+            leftspinServo.setPower(1);
+            rightspinServo.setPower(-1);
+        } else if (!gamepad2.b) {
+            leftspinServo.setPower(0);
+            rightspinServo.setPower(0);
         }
-        else if (gamepad2.a) {
-            clawServo.setPosition(1);
-        }
-
     }
 
     public void handlePivot() {
