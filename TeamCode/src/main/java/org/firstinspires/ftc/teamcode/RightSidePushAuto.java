@@ -20,7 +20,9 @@ public class RightSidePushAuto extends LinearOpMode {
     private DcMotorEx rightFrontDrive = null;
     private DcMotorEx rightBackDrive = null;
     private DcMotorEx wrist = null;
+    private DcMotorEx pivot = null;
     private Servo clawServo = null;
+    private DcMotor slide = null;
 
     ArrayList<DcMotorEx> driveMotors = new ArrayList<>();
 
@@ -35,6 +37,9 @@ public class RightSidePushAuto extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotorEx.class, "right_back");
         wrist = hardwareMap.get(DcMotorEx.class, "wrist");
         clawServo = hardwareMap.get(Servo.class, "claw");
+        pivot = hardwareMap.get(DcMotorEx.class, "pivot");
+        slide = hardwareMap.get(DcMotor.class, "slide");
+
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -52,6 +57,8 @@ public class RightSidePushAuto extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         wrist.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wrist.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         driveMotors.add(leftFrontDrive);
@@ -65,10 +72,45 @@ public class RightSidePushAuto extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        goTo(Constants.length_of_block,0,0,1,true);
+        clawServo.setPosition(Constants.claw_closed);
+        goTo(Constants.length_of_block/2,0,0,1,true);
+        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pivot.setTargetPosition((int)Constants.pivot_high_pose);
+        pivot.setPower(1);
+        while(pivot.isBusy()) telemetry.addLine("pivot is busy omg"); telemetry.update();
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setTargetPosition((int) Constants.slide_specimen_high_rung);
+        slide.setPower(1);
+        while(slide.isBusy()) telemetry.addLine("slide is busy omg"); telemetry.update();
+        double power = 0;
+        while(wrist.getCurrentPosition() < 270) {
+            wrist.setPower(.1);
+        }
+        clawServo.setPosition(Constants.claw_open);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setTargetPosition((int) Constants.slide_retracted_pose);
+        slide.setPower(1);
+        while(slide.isBusy()) telemetry.addLine("slide is busy omg"); telemetry.update();
+        clawServo.setPosition(Constants.claw_closed);
+        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pivot.setTargetPosition((int) Constants.pivot_intake_pose);
+        pivot.setPower(1);
+        while(pivot.isBusy()) telemetry.addLine("pivot is busy omg"); telemetry.update();
 
 
-         //goTo(300, 300, 90, 1, true);
+
+        //fruitloop(give me candy);
+        // wrist setmodde
+        // wrist run to position
+        // wrsist set target position 270
+
+
+
+        //goTo(300, 300, 90, 1, true);
         // forward just means that your going north int the direction of the robot. Strafe is side to side. Yaw is turning in degrees.
         // Speed is a number from -1 to 1 x 100 is the percent of speed.
         // Wait to finish means if true then wait for this line of code to finish while false means it can just run other code as well. //

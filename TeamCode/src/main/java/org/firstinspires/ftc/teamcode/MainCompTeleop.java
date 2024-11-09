@@ -188,50 +188,23 @@ public class MainCompTeleop extends LinearOpMode {
 
 
     public void handleSlide() {
-        /*
-        if (gamepad2.a) {
-            slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-
-        if(slide.getCurrentPosition() <= Constants.slide_max_position && slide.getCurrentPosition() >= 1) { //|| gamepad2.right_bumper || gamepad2.left_bumper) {
-            slide.setPower(gamepad2.right_stick_y);
-        } else if (slide.getCurrentPosition() > Constants.slide_max_position) {
-            slide.setPower(-0.2);
-        } else {
-            slide.setPower(0.2);
-        }
-        */
-
-        //if (slide.getCurrentPosition() <= Constants.slide_max_pose && slide.getCurrentPosition() >= Constants.slide_retracted_pose) {
-        //if (Math.abs(gamepad2.right_stick_y) > 0) {
-            //slide.setPower(Constants.slide_trapezoidal_power(slide.getCurrentPosition(), -(gamepad2.right_stick_y / Math.abs(gamepad2.right_stick_y))) - gamepad2.right_stick_y);
-        //}
-
-        //} else if (slide.getCurrentPosition() > Constants.slide_max_pose) {
-           // slide.setPower(-0.2);
-        //} else if (slide.getCurrentPosition() < Constants.slide_retracted_pose) {
-            //slide.setPower(0.2);
-        //}
-
-        /*
-        if(gamepad2.dpad_left) {
-            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setTargetPosition(0);
-            slide.setPower(0.5);
-        }
-        if(gamepad2.dpad_right) {
-            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            slide.setTargetPosition(-2600);
-            slide.setPower(0.5);
-        }
-         */
-
         slide.setPower(-gamepad2.right_stick_y * 1.5);
+        if (gamepad2.dpad_up) {
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setTargetPosition((int) Constants.slide_specimen_high_rung);
+            slide.setPower(1);
+        } else if (gamepad2.dpad_down) {
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setTargetPosition((int) Constants.slide_retracted_pose);
+            slide.setPower(1);
 
-
+        }
+        else if (gamepad2.right_stick_y > 0.1 || gamepad2.right_stick_y < -0.1) {
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slide.setPower(-gamepad2.right_stick_y);
+        }
     }
 
     public void handleClaw() {
