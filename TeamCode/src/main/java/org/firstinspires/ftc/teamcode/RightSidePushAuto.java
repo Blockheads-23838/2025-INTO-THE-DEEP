@@ -19,7 +19,7 @@ public class RightSidePushAuto extends LinearOpMode {
     private DcMotorEx leftBackDrive = null;
     private DcMotorEx rightFrontDrive = null;
     private DcMotorEx rightBackDrive = null;
-    private DcMotorEx wrist = null;
+    private Servo wrist = null;
     private DcMotorEx pivot = null;
     private Servo clawServo = null;
     private DcMotor slide = null;
@@ -35,7 +35,7 @@ public class RightSidePushAuto extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotorEx.class, "left_back");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "right_front");
         rightBackDrive = hardwareMap.get(DcMotorEx.class, "right_back");
-        wrist = hardwareMap.get(DcMotorEx.class, "wrist");
+        wrist = hardwareMap.get(Servo.class, "wrist");
         clawServo = hardwareMap.get(Servo.class, "claw");
         pivot = hardwareMap.get(DcMotorEx.class, "pivot");
         slide = hardwareMap.get(DcMotor.class, "slide");
@@ -55,10 +55,10 @@ public class RightSidePushAuto extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        wrist.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wrist.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         driveMotors.add(leftFrontDrive);
@@ -71,35 +71,53 @@ public class RightSidePushAuto extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
+        double power = 0;
         runtime.reset();
+
         clawServo.setPosition(Constants.claw_closed);
-        goTo(Constants.length_of_block/2,0,0,1,true);
+
+        goTo(500,0,0,1,false);
+
         pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         pivot.setTargetPosition((int)Constants.pivot_high_pose);
         pivot.setPower(1);
-        while(pivot.isBusy()) telemetry.addLine("pivot is busy omg"); telemetry.update();
+
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide.setTargetPosition((int) Constants.slide_specimen_high_rung);
         slide.setPower(1);
-        while(slide.isBusy()) telemetry.addLine("slide is busy omg"); telemetry.update();
-        double power = 0;
-        while(wrist.getCurrentPosition() < 270) {
-            wrist.setPower(.1);
+
+        while (slide.isBusy() || pivot.isBusy()) {
+            telemetry.addLine("beyond is currently getting cooked");
+            telemetry.update();
         }
+
+        while(wrist.getPosition() < 1) {
+            wrist.setPosition(1);
+        }
+
         clawServo.setPosition(Constants.claw_open);
+
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide.setTargetPosition((int) Constants.slide_retracted_pose);
         slide.setPower(1);
-        while(slide.isBusy()) telemetry.addLine("slide is busy omg"); telemetry.update();
+
         clawServo.setPosition(Constants.claw_closed);
         pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         pivot.setTargetPosition((int) Constants.pivot_intake_pose);
         pivot.setPower(1);
-        while(pivot.isBusy()) telemetry.addLine("pivot is busy omg"); telemetry.update();
+
+        wrist.setPosition(0);
+
+        while(slide.isBusy() || pivot.isBusy()) {
+            telemetry.addLine("Beyond is currently getting cooked");
+            telemetry.update();
+        }
+
+        goTo(-500, 1200, 0, power, true);
 
 
 
@@ -107,6 +125,8 @@ public class RightSidePushAuto extends LinearOpMode {
         // wrist setmodde
         // wrist run to position
         // wrsist set target position 270
+
+
 
 
 

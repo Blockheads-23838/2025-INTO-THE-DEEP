@@ -84,9 +84,8 @@ public class MainCompTeleop extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor slide = null;
     private DcMotorEx pivot = null;
-    private DcMotorEx wrist = null;
 
-    private Servo wristTest = null;
+    private Servo wrist = null;
 
     double servoSetpoint = 0;
 
@@ -111,10 +110,9 @@ public class MainCompTeleop extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        wrist = hardwareMap.get(DcMotorEx.class, "wrist");
         pivot = hardwareMap.get(DcMotorEx.class, "pivot");
 
-        wristTest = hardwareMap.get(Servo.class, "wristServoTest");
+        wrist = hardwareMap.get(Servo.class, "wrist");
 
         clawServo = hardwareMap.get(Servo.class, "claw");
 
@@ -140,13 +138,18 @@ public class MainCompTeleop extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        wrist.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wrist.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         pivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        pivot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         while (!isStarted() && !isStopRequested()) {
             //telemetry.addData("pivot position: ", pivot.getCurrentPosition());
@@ -169,7 +172,7 @@ public class MainCompTeleop extends LinearOpMode {
 
             telemetry.addData("pivot position (encoder counts):", pivot.getCurrentPosition());
             telemetry.addData("slide position (encoder counts): ", slide.getCurrentPosition());
-            telemetry.addData("wrist position", wrist.getCurrentPosition());
+            telemetry.addData("wrist position", wrist.getPosition());
             telemetry.addData("claw position", clawServo.getPosition());
 
             sleep(10);
@@ -180,8 +183,8 @@ public class MainCompTeleop extends LinearOpMode {
         servoSetpoint = servoSetpoint + (gamepad2.right_trigger - gamepad2.left_trigger) * 0.05;
         servoSetpoint = Math.max(Math.min(servoSetpoint, 1), 0);
         telemetry.addData("servo setpoint: ", servoSetpoint);
-        if (wristTest.getPosition() != servoSetpoint) {
-            wristTest.setPosition(servoSetpoint);
+        if (wrist.getPosition() != servoSetpoint) {
+            wrist.setPosition(servoSetpoint);
         }
     }
 
