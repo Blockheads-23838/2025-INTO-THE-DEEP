@@ -70,54 +70,6 @@ public class RightSidePushAuto extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        waitForStart();
-        double power = 0;
-        runtime.reset();
-
-        clawServo.setPosition(Constants.claw_closed);
-
-        goTo(500,0,0,1,false);
-
-        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        pivot.setTargetPosition((int)Constants.pivot_high_pose);
-        pivot.setPower(1);
-
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide.setTargetPosition((int) Constants.slide_specimen_high_rung);
-        slide.setPower(1);
-
-        while (slide.isBusy() || pivot.isBusy()) {
-            telemetry.addLine("beyond is currently getting cooked");
-            telemetry.update();
-        }
-
-        while(wrist.getPosition() < 1) {
-            wrist.setPosition(1);
-        }
-
-        clawServo.setPosition(Constants.claw_open);
-
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide.setTargetPosition((int) Constants.slide_retracted_pose);
-        slide.setPower(1);
-
-        clawServo.setPosition(Constants.claw_closed);
-        pivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pivot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        pivot.setTargetPosition((int) Constants.pivot_intake_pose);
-        pivot.setPower(1);
-
-        wrist.setPosition(0);
-
-        while(slide.isBusy() || pivot.isBusy()) {
-            telemetry.addLine("Beyond is currently getting cooked");
-            telemetry.update();
-        }
-
-        goTo(-500, 1200, 0, power, true);
 
 
 

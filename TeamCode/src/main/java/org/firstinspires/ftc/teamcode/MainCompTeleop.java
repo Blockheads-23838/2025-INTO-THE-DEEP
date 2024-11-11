@@ -180,7 +180,7 @@ public class MainCompTeleop extends LinearOpMode {
     }
 
     public void handleWrist() {
-        servoSetpoint = servoSetpoint + (gamepad2.right_trigger - gamepad2.left_trigger) * 0.05;
+        servoSetpoint += (gamepad2.right_trigger - gamepad2.left_trigger) * 0.03;
         servoSetpoint = Math.max(Math.min(servoSetpoint, 1), 0);
         telemetry.addData("servo setpoint: ", servoSetpoint);
         if (wrist.getPosition() != servoSetpoint) {
