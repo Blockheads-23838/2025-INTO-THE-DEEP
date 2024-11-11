@@ -160,6 +160,8 @@ public class MainCompTeleop extends LinearOpMode {
         }
         runtime.reset();
 
+        clawServo.setPosition(0.5);
+
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -180,7 +182,12 @@ public class MainCompTeleop extends LinearOpMode {
     }
 
     public void handleWrist() {
-        servoSetpoint += (gamepad2.right_trigger - gamepad2.left_trigger) * 0.03;
+        servoSetpoint =  servoSetpoint + (gamepad2.right_trigger - gamepad2.left_trigger) * 0.1;
+
+        if (gamepad2.left_bumper) { //intake specimen
+            servoSetpoint = 0.47;
+        }
+
         servoSetpoint = Math.max(Math.min(servoSetpoint, 1), 0);
         telemetry.addData("servo setpoint: ", servoSetpoint);
         if (wrist.getPosition() != servoSetpoint) {
