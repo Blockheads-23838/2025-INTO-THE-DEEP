@@ -4,6 +4,13 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public  class Constants {
+    // ------------ ODOMETRY ----------
+    public static double odo_dist_B = 12.7; //measured in centimeters; dist from forward encoders to lateral encoder
+    public static double odo_dist_L = 31.12; //measured in centimeters; dist between forward encoders
+    public static double odo_R = 1.6; //odometry deadwheel radius, in cm
+    public static double odo_N = 2000; //encoder ticks per revolution of odometry pods
+    public static double odo_cm_per_tick = 2.0 * Math.PI * odo_R / odo_N;
+
     // ------------ FIELD -------------
     public static double length_of_block = 878;
     //ticks
