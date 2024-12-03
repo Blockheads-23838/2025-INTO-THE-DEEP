@@ -188,6 +188,10 @@ public class MainCompTeleop extends LinearOpMode {
             servoSetpoint = 0.47;
         }
 
+        if (gamepad2.dpad_left) { //intake sample from ground - claw perpendicular to ground
+            servoSetpoint = 0; //SET TO CORRECT POSE
+        }
+
         servoSetpoint = Math.max(Math.min(servoSetpoint, 1), 0);
         telemetry.addData("servo setpoint: ", servoSetpoint);
         if (wrist.getPosition() != servoSetpoint) {
