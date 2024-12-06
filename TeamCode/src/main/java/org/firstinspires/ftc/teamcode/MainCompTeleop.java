@@ -229,10 +229,10 @@ public class MainCompTeleop extends LinearOpMode {
 
         //b is close; a is open
 
-        if (gamepad2.b) {
+        if (gamepad2.a) {
             clawServo.setPosition(0.5);
         }
-        else if (gamepad2.a) {
+        else if (gamepad2.b) {
             clawServo.setPosition(1);
         }
 
